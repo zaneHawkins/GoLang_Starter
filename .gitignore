@@ -1,33 +1,29 @@
-HELP.md
-target/
-!.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
+build
+.vscode
 
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.key
+*.so
+*.dylib
 
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
+# Test binary, built with `go test -c`
+*.test
 
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
 
-### VS Code ###
-.vscode/
+# Dependency directories (remove the comment below to include it)
+vendor/
+
+# Go workspace file
+go.work
+src/.env
+.env.production
+*.logs
+secure
+.idea/
+.DS_Store
+

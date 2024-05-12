@@ -1,0 +1,17 @@
+version: "3.7"
+services:
+  db:
+    restart: always
+    container_name: skillup
+    image: postgres:16-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_USER=user
+      - POSTGRES_DB=skillup
+    volumes:
+      - data:/var/lib/postgresql/data
+
+volumes:
+  data: {}
