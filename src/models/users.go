@@ -24,13 +24,13 @@ import (
 
 // User is an object representing the database table.
 type User struct {
-	UserID     string      `boil:"user_id" json:"user_id" toml:"user_id" yaml:"user_id"`
-	FirstName  null.String `boil:"first_name" json:"first_name,omitempty" toml:"first_name" yaml:"first_name,omitempty"`
-	LastName   null.String `boil:"last_name" json:"last_name,omitempty" toml:"last_name" yaml:"last_name,omitempty"`
-	Email      null.String `boil:"email" json:"email,omitempty" toml:"email" yaml:"email,omitempty"`
-	Password   null.String `boil:"password" json:"password,omitempty" toml:"password" yaml:"password,omitempty"`
-	DateJoined null.Time   `boil:"date_joined" json:"date_joined,omitempty" toml:"date_joined" yaml:"date_joined,omitempty"`
-	Status     bool        `boil:"status" json:"status" toml:"status" yaml:"status"`
+	UserID     string    `boil:"user_id" json:"user_id" toml:"user_id" yaml:"user_id"`
+	FirstName  string    `boil:"first_name" json:"first_name,omitempty" toml:"first_name" yaml:"first_name,omitempty"`
+	LastName   string    `boil:"last_name" json:"last_name,omitempty" toml:"last_name" yaml:"last_name,omitempty"`
+	Email      string    `boil:"email" json:"email,omitempty" toml:"email" yaml:"email,omitempty"`
+	Password   string    `boil:"password" json:"password,omitempty" toml:"password" yaml:"password,omitempty"`
+	DateJoined null.Time `boil:"date_joined" json:"date_joined,omitempty" toml:"date_joined" yaml:"date_joined,omitempty"`
+	Status     bool      `boil:"status" json:"status" toml:"status" yaml:"status"`
 
 	R *userR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L userL  `boil:"-" json:"-" toml:"-" yaml:"-"`

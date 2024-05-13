@@ -8,5 +8,7 @@ import (
 func SetupRoutes(app *fiber.App) {
 	app.Get("/health", controllers.Health)
 
-	//v1API := app.Group("/api/v1")
+	APIv1 := app.Group("/api/v1")
+
+	SetAuthenticationRoutes(APIv1)
 }
