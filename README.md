@@ -38,7 +38,8 @@ Documentation found here: https://github.com/golang-migrate/migrate.
    2. Install migrate `scoop install migrate`
 
 2. Create new migration files ```migrate create -ext sql -dir ./database/migrations -seq <change_name>```
-3. Update the database `migrate -database 'postgresql://user:password@localhost:5432/skillup?sslmode=disable' -path ./database/migrations up`
+3. Update the database `migrate -database 'postgresql://user:password@localhost:5432/skillup?sslmode=disable' -path ../database/migrations up`
+4. Reset the database  `migrate -database 'postgresql://user:password@localhost:5432/skillup?sslmode=disable' -path ../database/migrations down`
 
 ## SQLBoiler Guide
 
