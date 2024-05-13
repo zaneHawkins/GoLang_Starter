@@ -1,14 +1,13 @@
 package handler
 
 import (
+	"github.com/gofiber/fiber/v2"
 	"log"
-
-	"github.com/gofiber/fiber/v3"
 
 	U "src/utils"
 )
 
-func rollbackCtxTrx(ctx fiber.Ctx) {
+func rollbackCtxTrx(ctx *fiber.Ctx) {
 	trx, _ := U.StartNewPGTrx(ctx)
 
 	if trx != nil {
@@ -18,7 +17,7 @@ func rollbackCtxTrx(ctx fiber.Ctx) {
 	}
 }
 
-func commitCtxTrx(ctx fiber.Ctx) error {
+func commitCtxTrx(ctx *fiber.Ctx) error {
 	trx, err := U.StartNewPGTrx(ctx)
 
 	if err != nil {

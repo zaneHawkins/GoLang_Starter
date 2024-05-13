@@ -1,11 +1,11 @@
 package controllers
 
 import (
-	"github.com/gofiber/fiber/v3"
+	"github.com/gofiber/fiber/v2"
 	"src/config"
 )
 
-func Health(ctx fiber.Ctx) error {
+func Health(ctx *fiber.Ctx) error {
 	return ctx.JSON(fiber.Map{
 		"ok":  1,
 		"v":   config.Conf.Version,

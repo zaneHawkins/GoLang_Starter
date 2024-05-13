@@ -4,7 +4,7 @@ go 1.22.3
 
 require (
 	github.com/friendsofgo/errors v0.9.2
-	github.com/gofiber/fiber/v3 v3.0.0-beta.2
+	github.com/gofiber/fiber/v2 v2.52.4
 	github.com/joho/godotenv v1.5.1
 	github.com/volatiletech/null/v8 v8.1.2
 	github.com/volatiletech/sqlboiler/v4 v4.16.2

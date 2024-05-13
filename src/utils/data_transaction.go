@@ -3,7 +3,7 @@ package utils
 import (
 	"database/sql"
 
-	"github.com/gofiber/fiber/v3"
+	"github.com/gofiber/fiber/v2"
 	"src/db"
 )
 
@@ -11,7 +11,7 @@ const (
 	DbTrxKey = "db_trx_key"
 )
 
-func StartNewPGTrx(ctx fiber.Ctx) (*sql.Tx, error) {
+func StartNewPGTrx(ctx *fiber.Ctx) (*sql.Tx, error) {
 	if trx := ctx.Locals(DbTrxKey); trx != nil {
 		return trx.(*sql.Tx), nil
 	}

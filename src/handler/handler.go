@@ -1,12 +1,14 @@
 package handler
 
-import "github.com/gofiber/fiber/v3"
+import (
+	"github.com/gofiber/fiber/v2"
+)
 
-func ErrorHandler(ctx fiber.Ctx, err error) error {
+func ErrorHandler(ctx *fiber.Ctx, err error) error {
 	return BuildError(ctx, "Internal Server Error", fiber.StatusInternalServerError, err)
 }
 
-func BuildError(ctx fiber.Ctx, message interface{}, code int, originalErr error) error {
+func BuildError(ctx *fiber.Ctx, message interface{}, code int, originalErr error) error {
 	// rollback transaction
 	rollbackCtxTrx(ctx)
 
@@ -27,7 +29,7 @@ func BuildError(ctx fiber.Ctx, message interface{}, code int, originalErr error)
 	})
 }
 
-func Success(ctx fiber.Ctx, data interface{}) error {
+func Success(ctx *fiber.Ctx, data interface{}) error {
 	err := commitCtxTrx(ctx)
 
 	if err != nil {
