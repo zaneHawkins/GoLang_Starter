@@ -11,8 +11,9 @@ import (
 
 func NewTokens(user M.User) *T.Tokens {
 	token := &T.Tokens{}
-	token.AccessToken = createAccessToken(user.UserID)
-	token.RefreshToken = createRefreshToken(user.UserID)
+	token.AccessToken = createAccessToken(user.ID)
+	token.RefreshToken = createRefreshToken(user.ID)
+	fmt.Println("Tokens", token)
 	return token
 }
 
@@ -52,7 +53,5 @@ func createSignedToken(claims jwt.MapClaims, signingKey []byte) string {
 		return ""
 	}
 
-	// Print the JWT
-	fmt.Println("Refresh JWT:", tokenString)
 	return tokenString
 }
