@@ -21,7 +21,7 @@ func SignUp(ctx *fiber.Ctx) error {
 	if err := ctx.BodyParser(body); err != nil {
 		return H.BuildError(ctx, "Invalid body", fiber.StatusBadRequest, err)
 	}
-	tokens, serviceErr := S.SignUp(dbTrx, ctx.UserContext(), body)
+	tokens, serviceErr := S.SignUp(dbTrx, ctx, body)
 
 	if serviceErr != nil {
 		return H.BuildError(ctx, serviceErr.Message, serviceErr.Code, serviceErr.Error)
@@ -45,7 +45,20 @@ func Login(ctx *fiber.Ctx) error {
 	if err := ctx.BodyParser(body); err != nil {
 		return H.BuildError(ctx, "Invalid body", fiber.StatusBadRequest, err)
 	}
-	tokens, serviceErr := S.Login(dbTrx, ctx.UserContext(), body)
+	tokens, serviceErr := S.Login(dbTrx, ctx, body)
+
+	if serviceErr != nil {
+		return H.BuildError(ctx, serviceErr.Message, serviceErr.Code, serviceErr.Error)
+	}
+
+	return H.Success(ctx, fiber.Map{
+		"tokens": tokens,
+	})
+}
+
+func RefreshToken(ctx *fiber.Ctx) error {
+
+	tokens, serviceErr := S.RefreshToken(ctx)
 
 	if serviceErr != nil {
 		return H.BuildError(ctx, serviceErr.Message, serviceErr.Code, serviceErr.Error)

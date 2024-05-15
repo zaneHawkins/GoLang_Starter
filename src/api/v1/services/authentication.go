@@ -1,7 +1,6 @@
 package services
 
 import (
-	"context"
 	"github.com/friendsofgo/errors"
 	"github.com/gofiber/fiber/v2"
 	"github.com/volatiletech/sqlboiler/v4/boil"
@@ -13,7 +12,7 @@ import (
 	U "src/utils"
 )
 
-func SignUp(db boil.ContextExecutor, ctx context.Context, user *M.User) (*T.Tokens, *T.ServiceError) {
+func SignUp(db boil.ContextExecutor, ctx *fiber.Ctx, user *M.User) (*T.Tokens, *T.ServiceError) {
 	// Encrypt Password
 	pass, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
 	if err != nil {
@@ -22,7 +21,7 @@ func SignUp(db boil.ContextExecutor, ctx context.Context, user *M.User) (*T.Toke
 	user.Password = string(pass)
 
 	// Insert user
-	err = user.Insert(ctx, db, boil.Infer())
+	err = user.Insert(ctx.UserContext(), db, boil.Infer())
 	if err != nil {
 		return nil, H.ServiceError(fiber.StatusConflict, "Email already has an account", err)
 	}
@@ -32,9 +31,9 @@ func SignUp(db boil.ContextExecutor, ctx context.Context, user *M.User) (*T.Toke
 	return tokens, nil
 }
 
-func Login(db boil.ContextExecutor, ctx context.Context, loginRequest *T.LoginRequest) (*T.Tokens, *T.ServiceError) {
+func Login(db boil.ContextExecutor, ctx *fiber.Ctx, loginRequest *T.LoginRequest) (*T.Tokens, *T.ServiceError) {
 	// Find User by email
-	user, err := M.Users(qm.Where("email = ?", loginRequest.Email)).One(ctx, db)
+	user, err := M.Users(qm.Where("email = ?", loginRequest.Email)).One(ctx.UserContext(), db)
 	if err != nil {
 		return nil, H.ServiceError(fiber.StatusNotFound, "User not found", err)
 	}
@@ -48,4 +47,12 @@ func Login(db boil.ContextExecutor, ctx context.Context, loginRequest *T.LoginRe
 	// Get New JWT tokens
 	tokens := U.NewTokens(*user)
 	return tokens, nil
+}
+
+func RefreshToken(ctx *fiber.Ctx) (*T.Tokens, *T.ServiceError) {
+	refreshToken := ctx.Locals("refreshToken").(string)
+	userId := ctx.Locals("userId").(string)
+	newTokens := U.RefreshToken(userId)
+	newTokens.RefreshToken = refreshToken
+	return newTokens, nil
 }

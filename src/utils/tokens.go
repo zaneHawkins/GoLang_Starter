@@ -17,6 +17,12 @@ func NewTokens(user M.User) *T.Tokens {
 	return token
 }
 
+func RefreshToken(userId string) *T.Tokens {
+	tokens := &T.Tokens{}
+	tokens.AccessToken = createAccessToken(userId)
+	return tokens
+}
+
 func createAccessToken(userId string) string {
 	var signingKey = []byte(os.Getenv("ACCESS_KEY_SECRET"))
 
