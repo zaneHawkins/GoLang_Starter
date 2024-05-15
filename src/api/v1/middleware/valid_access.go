@@ -7,7 +7,7 @@ import (
 	H "src/handler"
 )
 
-func ValidateToken() fiber.Handler {
+func ValidateAccessToken() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		tokenString := ctx.Get("Authorization")
 		if tokenString == "" {

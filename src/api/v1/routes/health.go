@@ -10,6 +10,6 @@ import (
 func SetHealthRoutes(router fiber.Router) {
 
 	router.Get("/health", mw.RateLimit(C.Tier5, 0), controllers.Health)
-	router.Get("/secured-health", mw.RateLimit(C.Tier5, 0), mw.ValidateToken(), controllers.SecuredHealth)
+	router.Get("/secured-health", mw.RateLimit(C.Tier5, 0), mw.ValidateAccessToken(), controllers.SecuredHealth)
 
 }
