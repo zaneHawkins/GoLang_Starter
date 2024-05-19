@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"github.com/friendsofgo/errors"
 	"github.com/gofiber/fiber/v2"
 	S "src/api/v1/services"
 	H "src/handler"
@@ -21,6 +22,7 @@ func SignUp(ctx *fiber.Ctx) error {
 	if err := ctx.BodyParser(body); err != nil {
 		return H.BuildError(ctx, "Invalid body", fiber.StatusBadRequest, err)
 	}
+
 	tokens, serviceErr := S.SignUp(dbTrx, ctx, body)
 
 	if serviceErr != nil {
@@ -45,6 +47,7 @@ func Login(ctx *fiber.Ctx) error {
 	if err := ctx.BodyParser(body); err != nil {
 		return H.BuildError(ctx, "Invalid body", fiber.StatusBadRequest, err)
 	}
+
 	tokens, serviceErr := S.Login(dbTrx, ctx, body)
 
 	if serviceErr != nil {
@@ -54,6 +57,28 @@ func Login(ctx *fiber.Ctx) error {
 	return H.Success(ctx, fiber.Map{
 		"tokens": tokens,
 	})
+}
+
+func ForgotPassword(ctx *fiber.Ctx) error {
+	dbTrx, txErr := U.StartNewPGTrx(ctx)
+
+	if txErr != nil {
+		return H.BuildError(ctx, "Unable to get transaction", fiber.StatusInternalServerError, txErr)
+	}
+
+	email := ctx.Query("email")
+
+	if email == "" {
+		return H.BuildError(ctx, "Missing email parameter", fiber.StatusBadRequest, errors.New("Missing email parameter"))
+	}
+
+	serviceErr := S.ForgotPassword(dbTrx, ctx, email)
+
+	if serviceErr != nil {
+		return H.BuildError(ctx, serviceErr.Message, serviceErr.Code, serviceErr.Error)
+	}
+
+	return H.Success(ctx, nil)
 }
 
 func RefreshToken(ctx *fiber.Ctx) error {
