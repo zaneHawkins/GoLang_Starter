@@ -77,6 +77,29 @@ func RefreshToken(ctx *fiber.Ctx) (*T.Tokens, *T.ServiceError) {
 	return newTokens, nil
 }
 
+func ResetPassword(db boil.ContextExecutor, ctx *fiber.Ctx, loginRequest *T.LoginRequest) *T.ServiceError {
+	// Find User by email
+	user, err := M.Users(qm.Where("email = ?", loginRequest.Email)).One(ctx.UserContext(), db)
+	if err != nil {
+		return H.ServiceError(fiber.StatusNotFound, "User not found", err)
+	}
+
+	// Encrypt Password
+	pass, err := bcrypt.GenerateFromPassword([]byte(loginRequest.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return H.ServiceError(fiber.StatusInternalServerError, "Password Encryption failed", err)
+	}
+	user.Password = string(pass)
+
+	// Update User
+	_, err = user.Update(ctx.UserContext(), db, boil.Whitelist("password"))
+	if err != nil {
+		return H.ServiceError(fiber.StatusInternalServerError, "Failed to update password", err)
+	}
+
+	return nil
+}
+
 func sendPasswordResetEmail(user M.User, resetToken string) *T.ServiceError {
 	resetURL := fmt.Sprintf("https://yourdomain.com/reset-password?token=%s", resetToken)
 	emailBody := fmt.Sprintf("Click the link to reset your password: %s", resetURL)

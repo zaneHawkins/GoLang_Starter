@@ -59,6 +59,19 @@ func Login(ctx *fiber.Ctx) error {
 	})
 }
 
+func RefreshToken(ctx *fiber.Ctx) error {
+
+	tokens, serviceErr := S.RefreshToken(ctx)
+
+	if serviceErr != nil {
+		return H.BuildError(ctx, serviceErr.Message, serviceErr.Code, serviceErr.Error)
+	}
+
+	return H.Success(ctx, fiber.Map{
+		"tokens": tokens,
+	})
+}
+
 func ForgotPassword(ctx *fiber.Ctx) error {
 	dbTrx, txErr := U.StartNewPGTrx(ctx)
 
@@ -81,15 +94,30 @@ func ForgotPassword(ctx *fiber.Ctx) error {
 	return H.Success(ctx, nil)
 }
 
-func RefreshToken(ctx *fiber.Ctx) error {
+func ResetPassword(ctx *fiber.Ctx) error {
+	dbTrx, txErr := U.StartNewPGTrx(ctx)
 
-	tokens, serviceErr := S.RefreshToken(ctx)
+	if txErr != nil {
+		return H.BuildError(ctx, "Unable to get transaction", fiber.StatusInternalServerError, txErr)
+	}
+
+	body := &T.LoginRequest{}
+
+	if err := ctx.BodyParser(body); err != nil {
+		return H.BuildError(ctx, "Invalid body", fiber.StatusBadRequest, err)
+	}
+
+	if body.Email != "" && body.Email != ctx.Locals("email").(string) {
+		return H.BuildError(ctx, "Invalid request", fiber.StatusBadRequest, errors.New("Token does not match requested email"))
+	}
+
+	body.Email = ctx.Locals("email").(string)
+
+	serviceErr := S.ResetPassword(dbTrx, ctx, body)
 
 	if serviceErr != nil {
 		return H.BuildError(ctx, serviceErr.Message, serviceErr.Code, serviceErr.Error)
 	}
 
-	return H.Success(ctx, fiber.Map{
-		"tokens": tokens,
-	})
+	return H.Success(ctx, nil)
 }
