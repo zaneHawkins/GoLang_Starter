@@ -1,6 +1,7 @@
 package services
 
 import (
+	"fmt"
 	"github.com/friendsofgo/errors"
 	"github.com/gofiber/fiber/v2"
 	"github.com/volatiletech/sqlboiler/v4/boil"
@@ -49,10 +50,70 @@ func Login(db boil.ContextExecutor, ctx *fiber.Ctx, loginRequest *T.LoginRequest
 	return tokens, nil
 }
 
+func ForgotPassword(db boil.ContextExecutor, ctx *fiber.Ctx, email string) *T.ServiceError {
+	// Find User by email
+	user, err := M.Users(qm.Where("email = ?", email)).One(ctx.UserContext(), db)
+	if err != nil {
+		return H.ServiceError(fiber.StatusNotFound, "User not found", err)
+	}
+
+	// Generate Password Reset Token
+	resetToken := U.ResetPasswordToken(*user)
+
+	// Send Reset Email
+	er := sendPasswordResetEmail(*user, resetToken)
+	if er != nil {
+		return er
+	}
+
+	return nil
+}
+
 func RefreshToken(ctx *fiber.Ctx) (*T.Tokens, *T.ServiceError) {
 	refreshToken := ctx.Locals("refreshToken").(string)
 	userId := ctx.Locals("userId").(string)
 	newTokens := U.RefreshToken(userId)
 	newTokens.RefreshToken = refreshToken
 	return newTokens, nil
+}
+
+func ResetPassword(db boil.ContextExecutor, ctx *fiber.Ctx, loginRequest *T.LoginRequest) *T.ServiceError {
+	// Find User by email
+	user, err := M.Users(qm.Where("email = ?", loginRequest.Email)).One(ctx.UserContext(), db)
+	if err != nil {
+		return H.ServiceError(fiber.StatusNotFound, "User not found", err)
+	}
+
+	// Encrypt Password
+	pass, err := bcrypt.GenerateFromPassword([]byte(loginRequest.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return H.ServiceError(fiber.StatusInternalServerError, "Password Encryption failed", err)
+	}
+	user.Password = string(pass)
+
+	// Update User
+	_, err = user.Update(ctx.UserContext(), db, boil.Whitelist("password"))
+	if err != nil {
+		return H.ServiceError(fiber.StatusInternalServerError, "Failed to update password", err)
+	}
+
+	return nil
+}
+
+func sendPasswordResetEmail(user M.User, resetToken string) *T.ServiceError {
+	resetURL := fmt.Sprintf("https://yourdomain.com/reset-password?token=%s", resetToken)
+	emailBody := fmt.Sprintf("Click the link to reset your password: %s", resetURL)
+
+	email := U.Mail{
+		To:      []string{user.Email},
+		Subject: "Reset your password",
+		Body:    emailBody,
+	}
+
+	err := U.SendEmail(&email)
+	if err != nil {
+		return H.ServiceError(fiber.StatusInternalServerError, "Failed to send email", err)
+	}
+
+	return nil
 }
